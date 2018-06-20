@@ -1,0 +1,69 @@
+19:21 $ docker swarm init --advertise-addr 192.168.2.227
+Swarm initialized: current node (l5t357gsmnq5fb9vago0zxi2o) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-161n4106b4htlav4ev43cyxwciruo4x5pb5fpj9v5ay8y7i5so-d9l10gdpacux982r1xa3ajwb3 192.168.2.227:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+
+$ docker stack deploy -c docker-compose.yml getstartedlab
+Creating network getstartedlab_webnet
+Creating service getstartedlab_web
+
+$ docker service ls
+ID                  NAME                MODE                REPLICAS            IMAGE                  PORTS
+iszxyi206n83        getstartedlab_web   replicated          5/5                 flaskhello_ex:latest   *:4000->80/tcp
+
+
+$ docker container ls
+CONTAINER ID        IMAGE                  COMMAND             CREATED             STATUS              PORTS               NAMES
+576f7ee5f296        flaskhello_ex:latest   "python app.py"     24 minutes ago      Up 24 minutes       80/tcp              getstartedlab_web.2.m7z30em6s01jqdj3ritleu8r8
+1e0b4e97d8d7        flaskhello_ex:latest   "python app.py"     24 minutes ago      Up 24 minutes       80/tcp              getstartedlab_web.5.10q6pwl1iyqeo4oxw5r09rzzo
+4d34cde658a8        flaskhello_ex:latest   "python app.py"     24 minutes ago      Up 24 minutes       80/tcp              getstartedlab_web.1.hmtlz1cylb08gf2typlr5g89c
+c7576e3a7879        flaskhello_ex:latest   "python app.py"     24 minutes ago      Up 24 minutes       80/tcp              getstartedlab_web.4.s6qu93omqrb09oip4vqek6kli
+e70a6bca1483        flaskhello_ex:latest   "python app.py"     24 minutes ago      Up 24 minutes       80/tcp              getstartedlab_web.3.tjaeovhjwpwtnhl2us8qsx9ps
+
+# Testing 
+
+for i in {1..5}; do curl -4 http://localhost:4000 ; done
+<h3>Hello World!</h3><b>Hostname:</b> e70a6bca1483<br/><b>Visits:</b> <i>cannot connect to Redis, counter disabled</i><h3>Hello World!</h3><b>Hostname:</b> 4d34cde658a8<br/><b>Visits:</b> <i>cannot connect to Redis, counter disabled</i><h3>Hello World!</h3><b>Hostname:</b> c7576e3a7879<br/><b>Visits:</b> <i>cannot connect to Redis, counter disabled</i><h3>Hello World!</h3><b>Hostname:</b> 1e0b4e97d8d7<br/><b>Visits:</b> <i>cannot connect to Redis, counter disabled</i><h3>Hello World!</h3><b>Hostname:</b> 576f7ee5f296<br/><b>Visits:</b> <i>cannot connect to Redis, counter disabled</i>
+
+
+
+# Increase the replicas and update without tearing of existing instances
+docker stack deploy -c docker-compose.yml getstartedlab
+
+19:47 $ docker stack deploy -c docker-compose.yml getstartedlab
+Updating service getstartedlab_web (id: iszxyi206n831wary09aet0lt)
+image flaskhello_ex:latest could not be accessed on a registry to record
+its digest. Each node will access flaskhello_ex:latest independently,
+possibly leading to different nodes running different
+versions of the image.
+
+
+19:48 $ docker container ls
+CONTAINER ID        IMAGE                  COMMAND             CREATED             STATUS              PORTS               NAMES
+adbf4451592f        flaskhello_ex:latest   "python app.py"     54 seconds ago      Up 47 seconds       80/tcp              getstartedlab_web.6.ay1794nh2vfytz2vl4txmd0wi
+01850eee2e44        flaskhello_ex:latest   "python app.py"     54 seconds ago      Up 48 seconds       80/tcp              getstartedlab_web.8.ereegtbj107eqt50g4i8zrkyz
+02793698adb4        flaskhello_ex:latest   "python app.py"     54 seconds ago      Up 49 seconds       80/tcp              getstartedlab_web.9.tzrj7vim6c0xtq4g7remsi2o4
+7641a75760a3        flaskhello_ex:latest   "python app.py"     54 seconds ago      Up 49 seconds       80/tcp              getstartedlab_web.7.mrsi4g2ezk4q5be78vs7h8qiw
+6078d266cb22        flaskhello_ex:latest   "python app.py"     55 seconds ago      Up 51 seconds       80/tcp              getstartedlab_web.10.kj9g5mmzs1pqkh5lmj4e6oi6y
+576f7ee5f296        flaskhello_ex:latest   "python app.py"     26 minutes ago      Up 26 minutes       80/tcp              getstartedlab_web.2.m7z30em6s01jqdj3ritleu8r8
+1e0b4e97d8d7        flaskhello_ex:latest   "python app.py"     26 minutes ago      Up 25 minutes       80/tcp              getstartedlab_web.5.10q6pwl1iyqeo4oxw5r09rzzo
+4d34cde658a8        flaskhello_ex:latest   "python app.py"     26 minutes ago      Up 26 minutes       80/tcp              getstartedlab_web.1.hmtlz1cylb08gf2typlr5g89c
+c7576e3a7879        flaskhello_ex:latest   "python app.py"     26 minutes ago      Up 26 minutes       80/tcp              getstartedlab_web.4.s6qu93omqrb09oip4vqek6kli
+e70a6bca1483        flaskhello_ex:latest   "python app.py"     26 minutes ago      Up 26 minutes       80/tcp              getstartedlab_web.3.tjaeovhjwpwtnhl2us8qsx9ps
+
+
+19:49 $ docker stack rm getstartedlab
+Removing service getstartedlab_web
+Removing network getstartedlab_webnet
+
+
+19:49 $ docker swarm leave --force
+Node left the swarm.
+
+
