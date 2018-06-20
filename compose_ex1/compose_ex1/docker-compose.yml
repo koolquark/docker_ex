@@ -1,0 +1,23 @@
+version: "3"
+services:
+  web:
+    # the service is called web 
+    # replace username/repo:tag with your name and image details
+    # image: username/repo:tag
+    image: flaskhello_ex
+    deploy:
+      replicas: 10
+      resources:
+        limits:
+          # 5 instances each one limited to 10% of cpu and 50M ram
+          cpus: "0.1"  
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      # the service web's containers share port 80 via load balanced nw called webnet
+      - "4000:80"
+    networks:
+      - webnet
+networks:
+  webnet:
